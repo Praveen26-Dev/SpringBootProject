@@ -29,7 +29,7 @@ public class SecurityConfig {
         http.sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         
         http.authorizeHttpRequests(auth->auth
-        		.requestMatchers("/auth/**").permitAll().anyRequest().authenticated());
+        		.requestMatchers("/auth/**","/api/categories/**").permitAll().anyRequest().authenticated());
         
         http.addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class);
      
