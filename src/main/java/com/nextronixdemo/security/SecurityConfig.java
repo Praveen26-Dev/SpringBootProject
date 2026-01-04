@@ -29,7 +29,15 @@ public class SecurityConfig {
         http.sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         
         http.authorizeHttpRequests(auth->auth
-        		.requestMatchers("/auth/**","/api/categories/**","/api/brands/**").permitAll().anyRequest().authenticated());
+        		.requestMatchers(
+        				"/auth/**",
+        				"/api/categories/**",
+        				"/api/brands/**",
+        				"/api/products/**"
+        				)
+        		        .permitAll()
+        		        .anyRequest()
+        		        .authenticated());
         
         http.addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class);
      
