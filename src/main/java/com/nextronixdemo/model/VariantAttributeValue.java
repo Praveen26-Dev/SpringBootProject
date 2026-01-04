@@ -1,5 +1,7 @@
 package com.nextronixdemo.model;
 
+
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,31 +13,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 @Entity
-@Table(name="variants")
+@Table(name="variant_attribute_values" )
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Variant {
-	
-    @Id
+public class VariantAttributeValue {
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
-    private Long productId;
+    private Long variantId;
 
     @Column
-    private String sku;
+    private Long attributeId;
 
     @Column
-    private Double price;
-
-    @Column
-    private Integer stock;
-
-    @Column
-    private Boolean isActive = true;
-
+    private Long attributeValueId;
+	
 }
