@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nextronixdemo.dto.ProductRequest;
-import com.nextronixdemo.dto.ProductResponse;
+import com.nextronixdemo.dto.ProductRequestDto;
+import com.nextronixdemo.dto.ProductResponseDto;
 import com.nextronixdemo.service.ProductService;
 
 @RestController
@@ -19,12 +19,12 @@ public class ProductController {
 	private ProductService productService;
 
 	@PostMapping
-	public ProductResponse createProduct(@RequestBody ProductRequest dto) {
+	public ProductResponseDto createProduct(@RequestBody ProductRequestDto dto) {
 		return productService.createProduct(dto);
 		
 	}
 	@GetMapping("/{slug}")
-	public ProductResponse getProductBySlug(@PathVariable String slug) {
+	public ProductResponseDto getProductBySlug(@PathVariable String slug) {
 		return productService.getProductBySlug(slug);
 		
 	}

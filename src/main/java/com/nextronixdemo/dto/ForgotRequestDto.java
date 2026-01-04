@@ -3,7 +3,7 @@ package com.nextronixdemo.dto;
 import lombok.Data;
 
 @Data
-public class ForgotRequest {
+public class ForgotRequestDto {
 
 	private String email;
 	

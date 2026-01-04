@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nextronixdemo.dto.GoogleLoginRequest;
-import com.nextronixdemo.dto.LoginRequest;
-import com.nextronixdemo.dto.RegisterRequest;
+import com.nextronixdemo.dto.GoogleLoginRequestDto;
+import com.nextronixdemo.dto.LoginRequestDto;
+import com.nextronixdemo.dto.RegisterRequestDto;
 import com.nextronixdemo.service.LoginAuthService;
 import com.nextronixdemo.service.GoogleAuthService;
 
@@ -30,12 +30,12 @@ public class AuthController {
 //	}
 	
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest req) {
+    public String login(@RequestBody LoginRequestDto req) {
     	return loginAuthService.login(req);
     }
     
     @PostMapping("/google")
-    public String googleLogin(@RequestBody GoogleLoginRequest req) {
+    public String googleLogin(@RequestBody GoogleLoginRequestDto req) {
     	 return googleAuthService.SignInWithGoogle(req.getIdToken());
     }
     

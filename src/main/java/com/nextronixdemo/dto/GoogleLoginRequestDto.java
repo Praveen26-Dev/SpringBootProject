@@ -3,6 +3,6 @@ package com.nextronixdemo.dto;
 import lombok.Data;
 
 @Data
-public class GoogleLoginRequest {
+public class GoogleLoginRequestDto {
  private String idToken;
 }

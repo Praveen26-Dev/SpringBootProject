@@ -11,8 +11,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.nextronixdemo.dto.CategoryRequest;
-import com.nextronixdemo.dto.CategoryResponse;
+import com.nextronixdemo.dto.CategoryRequestDto;
+import com.nextronixdemo.dto.CategoryResponseDto;
 import com.nextronixdemo.model.Category;
 import com.nextronixdemo.repository.CategoryRepository;
 
@@ -25,12 +25,12 @@ public class CategoryService {
     @Autowired
     private ModelMapper modelMapper;
 
-    public void createCategoriesBulk(List<CategoryRequest> dtos) {
+    public void createCategoriesBulk(List<CategoryRequestDto> dtos) {
 
         Map<String, Category> tempMap = new HashMap<>();
 
         // 1️⃣ Save ROOT categories
-        for (CategoryRequest dto : dtos) {
+        for (CategoryRequestDto dto : dtos) {
             if (dto.getParentTempId() == null) {
                 Category category = modelMapper.map(dto, Category.class);
                 category.setLevel(0); // root level
@@ -45,7 +45,7 @@ public class CategoryService {
         do {
             pending = false;
 
-            for (CategoryRequest dto : dtos) {
+            for (CategoryRequestDto dto : dtos) {
 
                 if (dto.getParentTempId() != null 
                         && !tempMap.containsKey(dto.getTempId())) {
@@ -73,14 +73,14 @@ public class CategoryService {
 
     }
     
-    public List<CategoryResponse> getBreadCrumb(Long categoryId)
+    public List<CategoryResponseDto> getBreadCrumb(Long categoryId)
     {
-    	List <CategoryResponse> breadCrumb = new ArrayList<>();
+    	List <CategoryResponseDto> breadCrumb = new ArrayList<>();
     	Category current = categoryRepository.findById(categoryId)
     			            .orElseThrow(()-> new RuntimeException("Category not Found"));
     	
     	while(current!=null) {
-    		breadCrumb.add(modelMapper.map(current,CategoryResponse.class));
+    		breadCrumb.add(modelMapper.map(current,CategoryResponseDto.class));
     		current =current.getParentId()==null 
     				?null
     			    :categoryRepository.findById(current.getParentId()).orElse(null);

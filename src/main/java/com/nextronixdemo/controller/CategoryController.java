@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nextronixdemo.dto.CategoryRequest;
-import com.nextronixdemo.dto.CategoryResponse;
+import com.nextronixdemo.dto.CategoryRequestDto;
+import com.nextronixdemo.dto.CategoryResponseDto;
 import com.nextronixdemo.service.CategoryService;
 
 @RestController
@@ -22,14 +22,14 @@ public class CategoryController {
 	private CategoryService categoryService;
 	
 	@PostMapping("/bulk")
-	public String createCategories(@RequestBody List<CategoryRequest> dtos) {
+	public String createCategories(@RequestBody List<CategoryRequestDto> dtos) {
 		
 		categoryService.createCategoriesBulk(dtos);
 		return "Categories Created successfully";
 	}
 	
 	@GetMapping("/breadcrumb/{categoryId}")
-	public List<CategoryResponse> postMethodName(@PathVariable Long categoryId) {
+	public List<CategoryResponseDto> postMethodName(@PathVariable Long categoryId) {
 		//TODO: process POST request
 		
 		return categoryService.getBreadCrumb(categoryId);

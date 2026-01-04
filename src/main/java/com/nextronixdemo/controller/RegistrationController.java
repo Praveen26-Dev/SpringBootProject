@@ -3,7 +3,7 @@ package com.nextronixdemo.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.nextronixdemo.dto.RegisterRequest;
+import com.nextronixdemo.dto.RegisterRequestDto;
 import com.nextronixdemo.service.RegistrationService;
 
 @RestController
@@ -14,7 +14,7 @@ public class RegistrationController {
     private RegistrationService registrationService;
 
     @PostMapping("/register")
-    public String register(@RequestBody RegisterRequest req) {
+    public String register(@RequestBody RegisterRequestDto req) {
         registrationService.registerUser(req);
         return "User registered. Verify Email and Phone OTP.";
     }

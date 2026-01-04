@@ -3,7 +3,7 @@ package com.nextronixdemo.dto;
 import lombok.Data;
 
 @Data
-public class LoginRequest {
+public class LoginRequestDto {
 
 	 
 	private String identifier;

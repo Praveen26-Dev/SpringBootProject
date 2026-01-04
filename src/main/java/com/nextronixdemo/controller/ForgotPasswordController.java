@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nextronixdemo.dto.ForgotRequest;
-import com.nextronixdemo.dto.ResetPasswordRequest;
+import com.nextronixdemo.dto.ForgotRequestDto;
+import com.nextronixdemo.dto.ResetPasswordRequestDto;
 import com.nextronixdemo.service.ForgotPasswordService;
 
 @RestController
@@ -20,7 +20,7 @@ public class ForgotPasswordController {
 	private ForgotPasswordService forgotPasswordService;
 	
 	@PostMapping("/forgot-password")
-	public ResponseEntity<String> forgotPassword(@RequestBody ForgotRequest request) {
+	public ResponseEntity<String> forgotPassword(@RequestBody ForgotRequestDto request) {
 	 forgotPasswordService.sendResetLink(request);
 	 return ResponseEntity.ok("If email Exists, verfication link send to email"); 	
 	}
@@ -32,7 +32,7 @@ public class ForgotPasswordController {
 	}
 	
 	@PostMapping("/reset-password")
-	public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest req) {
+	public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequestDto req) {
 		forgotPasswordService.resetPass(req);
 		return ResponseEntity.ok("Password is changed");
 	}

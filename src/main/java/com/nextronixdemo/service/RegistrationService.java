@@ -7,7 +7,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.nextronixdemo.dto.RegisterRequest;
+import com.nextronixdemo.dto.RegisterRequestDto;
 import com.nextronixdemo.model.User;
 import com.nextronixdemo.repository.UserRepository;
 import com.nextronixdemo.utils.EmailServiceReg;
@@ -33,7 +33,7 @@ public class RegistrationService {
     private RedisTemplate<String, String> redisTemplate;
 
     // REGISTER
-    public void registerUser(RegisterRequest request) {
+    public void registerUser(RegisterRequestDto request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already registered");

@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.nextronixdemo.dto.LoginRequest;
-import com.nextronixdemo.dto.RegisterRequest;
+import com.nextronixdemo.dto.LoginRequestDto;
+import com.nextronixdemo.dto.RegisterRequestDto;
 import com.nextronixdemo.model.User;
 import com.nextronixdemo.repository.UserRepository;
 import com.nextronixdemo.security.JwtUtil;
@@ -43,7 +43,7 @@ public class LoginAuthService {
 //	}
 	
 	
-	public String login(LoginRequest req) {
+	public String login(LoginRequestDto req) {
 
         String identifier = req.getIdentifier();
         String password = req.getPassword();

@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nextronixdemo.dto.BrandRequest;
-import com.nextronixdemo.dto.BrandResponse;
+import com.nextronixdemo.dto.BrandRequestDto;
+import com.nextronixdemo.dto.BrandResponseDto;
 import com.nextronixdemo.service.BrandService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,14 +23,14 @@ public class BrandController {
 	private final BrandService brandService;
 	
 	@PostMapping("/bulk")
-	public String createBrands(@RequestBody List<BrandRequest> dtos ) {
+	public String createBrands(@RequestBody List<BrandRequestDto> dtos ) {
         brandService.createBrandsBulk(dtos);
         
         return "Brands Created Successfully";
     }
 	
 	@GetMapping
-	public List<BrandResponse> getAllBrands(){
+	public List<BrandResponseDto> getAllBrands(){
 		return brandService.getAllBrands();
 	}
 }

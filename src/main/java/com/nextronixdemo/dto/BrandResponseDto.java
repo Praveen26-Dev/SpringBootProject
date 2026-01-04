@@ -3,7 +3,7 @@ package com.nextronixdemo.dto;
 import lombok.Data;
 
 @Data
-public class BrandResponse {
+public class BrandResponseDto {
 	
 	private String name;
 	private String slug;

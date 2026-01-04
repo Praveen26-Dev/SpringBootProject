@@ -8,8 +8,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.nextronixdemo.dto.ForgotRequest;
-import com.nextronixdemo.dto.ResetPasswordRequest;
+import com.nextronixdemo.dto.ForgotRequestDto;
+import com.nextronixdemo.dto.ResetPasswordRequestDto;
 import com.nextronixdemo.model.User;
 import com.nextronixdemo.repository.UserRepository;
 import com.nextronixdemo.utils.EmailServiceReg;
@@ -30,7 +30,7 @@ public class ForgotPasswordService {
 	@Autowired 
 	private RedisTemplate<String ,String > redisTemplate;
 	
-	public void sendResetLink(ForgotRequest request) {
+	public void sendResetLink(ForgotRequestDto request) {
 	 userRepository.findByEmail(request.getEmail()).ifPresent(user->{
 		
 //		 String token = TokenUtil.generateToken();
@@ -60,7 +60,7 @@ public class ForgotPasswordService {
 		
 	}
 
-	public void resetPass(ResetPasswordRequest req) {
+	public void resetPass(ResetPasswordRequestDto req) {
 		String redisKey="reset:"+req.getToken();
 		String userId= redisTemplate.opsForValue().get(redisKey);
 		

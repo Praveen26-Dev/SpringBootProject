@@ -3,7 +3,7 @@ package com.nextronixdemo.dto;
 import lombok.Data;
 
 @Data
-public class CategoryRequest {
+public class CategoryRequestDto {
 
 	private String tempId;
 	private String name;
