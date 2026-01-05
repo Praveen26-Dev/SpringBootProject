@@ -1,0 +1,11 @@
+package com.nextronixdemo.dto;
+
+import lombok.Data;
+
+@Data
+public class VariantPriceRequestDto {
+
+	private Double mrp;
+	private Double sellingPrice;
+	
+}

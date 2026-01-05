@@ -1,5 +1,7 @@
 package com.nextronixdemo.model;
 
-public class DiscountType {
 
+public enum DiscountType {
+	PERCENT,
+	FLAT
 }
