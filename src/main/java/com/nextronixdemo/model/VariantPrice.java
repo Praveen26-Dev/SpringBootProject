@@ -1,6 +1,5 @@
 package com.nextronixdemo.model;
 
-import org.springframework.stereotype.Service;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,11 +9,12 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name="variant_prices")
 @Getter
-@Service
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class VariantPrice {
@@ -26,5 +26,6 @@ public class VariantPrice {
 	private Long variantId;
 	private Double mrp;
 	private Double sellingPrice;
+
 
 }

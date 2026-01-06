@@ -29,9 +29,9 @@ public class VariantPricingService {
                 .findByVariantId(variantId)
                 .orElse(new VariantPrice());
 
-//        price.setVariantId(variantId);
-//        price.setMrp(request.getMrp());
-//        price.setSellingPrice(request.getSellingPrice());
+        price.setVariantId(variantId);
+        price.setMrp(request.getMrp());
+        price.setSellingPrice(request.getSellingPrice());
 
         priceRepository.save(price);
     }
@@ -40,15 +40,8 @@ public class VariantPricingService {
 
     public void setDiscount(Long variantId, VariantDiscountRequestDto request) {
 
-        // deactivate old discount (if exists)
-        discountRepository
-                .findByVariantIdAndIsActiveTrue(variantId)
-                .ifPresent(old -> {
-                    old.setIsActive(false);
-                    discountRepository.save(old);
-                });
-
-        VariantDiscount discount = new VariantDiscount();
+        VariantDiscount discount = discountRepository.findByVariantIdAndIsActiveTrue(variantId).orElse(new VariantDiscount());
+        
         discount.setVariantId(variantId);
         discount.setDiscountType(request.getDiscountType());
         discount.setDiscountValue(request.getDiscountValue());
@@ -66,34 +59,30 @@ public class VariantPricingService {
                 .orElseThrow(() ->
                         new RuntimeException("Price not found for variant"));
 
-        VariantDiscount discount = discountRepository
-                .findByVariantIdAndIsActiveTrue(variantId)
-                .orElse(null);
-
         double discountAmount = 0.0;
+        var  discountOpt = discountRepository
+                .findByVariantIdAndIsActiveTrue(variantId);
 
-        if (discount != null) {
+     
+
+        if (discountOpt.isPresent()) 
+        {
+        	 VariantDiscount discount = discountOpt.get();
             if (discount.getDiscountType() == DiscountType.PERCENT) {
                 discountAmount =
                         price.getSellingPrice()
                         * discount.getDiscountValue() / 100;
 
-            } else if (discount.getDiscountType() == DiscountType.FLAT) {
+            } else {
                 discountAmount = discount.getDiscountValue();
             }
-        }
-
-        double finalPrice = price.getSellingPrice() - discountAmount;
-
-        if (finalPrice < 0) {
-            finalPrice = 0.0;
         }
 
         VariantPricingResponseDto response = new VariantPricingResponseDto();
         response.setMrp(price.getMrp());
         response.setSellingPrice(price.getSellingPrice());
         response.setDiscount(discountAmount);
-        response.setFinalPrice(finalPrice);
+        response.setFinalPrice(price.getSellingPrice() - discountAmount);
 
         return response;
     }

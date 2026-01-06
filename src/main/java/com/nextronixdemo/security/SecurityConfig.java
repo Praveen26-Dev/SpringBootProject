@@ -34,7 +34,8 @@ public class SecurityConfig {
         				"/api/categories/**",
         				"/api/brands/**",
         				"/api/products/**",
-        				"/api/attributes/**"
+        				"/api/attributes/**",
+        				"/api/variants/**"
         				)
         		        .permitAll()
         		        .anyRequest()
