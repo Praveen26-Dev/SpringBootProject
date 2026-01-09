@@ -8,5 +8,6 @@ public class ProductImageResponseDto {
 	private Long id;
 	
 	private String imageUrl;
+	private Boolean isPrimary;
 	
 }

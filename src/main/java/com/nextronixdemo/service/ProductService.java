@@ -1,5 +1,7 @@
 package com.nextronixdemo.service;
 
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -34,4 +36,17 @@ public class ProductService {
 		return modelMapper.map(product, ProductResponseDto.class);
 	}
 	
+
+        public ProductResponseDto getProductById(Long id) {
+		
+		Product product = productRepository.findById(id).orElseThrow(()->new RuntimeException("Product not found"));
+		return modelMapper.map(product, ProductResponseDto.class);
+	    }
+	public List<ProductResponseDto> getAllProducts() {
+
+	    return productRepository.findAll()
+	            .stream()
+	            .map(product -> modelMapper.map(product, ProductResponseDto.class))
+	            .toList();
+	}
 }

@@ -29,4 +29,10 @@ public class ProductController {
 		
 	}
 	
+	@GetMapping("/id/{id}")
+	public ProductResponseDto getProductBySlug(@PathVariable Long id) {
+		return productService.getProductById(id);
+		
+	}
+	
 }
