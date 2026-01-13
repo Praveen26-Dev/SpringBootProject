@@ -51,7 +51,7 @@ public class AttributeController {
             @PathVariable Long id) {
 
         AttributeResponseDto attribute =
-                attributeService.getAttributeById(id);
+                attributeService.getAttribute(id);
 
         return ResponseEntity.ok(attribute);
     }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.nextronixdemo.dto.AttributeRequestDto;
 import com.nextronixdemo.dto.AttributeResponseDto;
+import com.nextronixdemo.dto.AttributeValueResponseDto;
 import com.nextronixdemo.model.Attribute;
 import com.nextronixdemo.model.AttributeValue;
 import com.nextronixdemo.repository.AttributeRepository;
@@ -18,79 +19,61 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AttributeService {
 
-	private final AttributeRepository attributeRepository;
-    private final AttributeValueRepository attributeValueRepository;
-    
+    private final AttributeRepository attributeRepo;
+    private final AttributeValueRepository valueRepo;
+
+    /* ================= CREATE ATTRIBUTE + VALUES ================= */
+
     public AttributeResponseDto createAttribute(AttributeRequestDto dto) {
 
-        // 1️⃣ Save Attribute
         Attribute attribute = new Attribute();
         attribute.setName(dto.getName());
+        attribute = attributeRepo.save(attribute);
 
-        attribute = attributeRepository.save(attribute);
-
-        // 2️⃣ Save Attribute Values
-        if (dto.getValues() != null && !dto.getValues().isEmpty()) {
-            for (String value : dto.getValues()) {
-                AttributeValue attributeValue = new AttributeValue();
-                attributeValue.setAttributeId(attribute.getId());
-                attributeValue.setValue(value);
-
-                attributeValueRepository.save(attributeValue);
-            }
+        for (String val : dto.getValues()) {
+            AttributeValue value = new AttributeValue();
+            value.setAttributeId(attribute.getId());
+            value.setValue(val);
+            valueRepo.save(value);
         }
 
-        // 3️⃣ Prepare response
-        AttributeResponseDto response = new AttributeResponseDto();
-        response.setId(attribute.getId());
-        response.setName(attribute.getName());
-        response.setValues(dto.getValues());
+        return getAttribute(attribute.getId()); // return with IDs
+    }
 
-        return response;
+    /* ================= GET SINGLE ATTRIBUTE ================= */
+
+    public AttributeResponseDto getAttribute(Long attributeId) {
+
+        Attribute attribute = attributeRepo.findById(attributeId)
+                .orElseThrow(() -> new RuntimeException("Attribute not found"));
+
+        List<AttributeValueResponseDto> values =
+        	    valueRepo.findByAttributeId(attributeId)
+        	        .stream()
+        	        .map(v -> {
+        	            AttributeValueResponseDto dto = new AttributeValueResponseDto();
+        	            dto.setId(v.getId());
+        	            dto.setValue(v.getValue());
+        	            return dto;
+        	        })
+        	        .collect(Collectors.toList());
+
+
+        AttributeResponseDto res = new AttributeResponseDto();
+        res.setId(attribute.getId());
+        res.setName(attribute.getName());
+        res.setValues(values);
+
+        return res;
     }
 
     /* ================= GET ALL ATTRIBUTES ================= */
 
     public List<AttributeResponseDto> getAllAttributes() {
 
-        return attributeRepository.findAll()
+        return attributeRepo.findAll()
                 .stream()
-                .map(attribute -> {
-
-                    List<String> values = attributeValueRepository
-                            .findByAttributeId(attribute.getId())
-                            .stream()
-                            .map(AttributeValue::getValue)
-                            .collect(Collectors.toList());
-
-                    AttributeResponseDto dto = new AttributeResponseDto();
-                    dto.setId(attribute.getId());
-                    dto.setName(attribute.getName());
-                    dto.setValues(values);
-
-                    return dto;
-                })
-                .collect(Collectors.toList());
-    }
-
-    /* ================= GET ATTRIBUTE BY ID ================= */
-
-    public AttributeResponseDto getAttributeById(Long id) {
-
-        Attribute attribute = attributeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Attribute not found"));
-
-        List<String> values = attributeValueRepository
-                .findByAttributeId(attribute.getId())
-                .stream()
-                .map(AttributeValue::getValue)
-                .collect(Collectors.toList());
-
-        AttributeResponseDto dto = new AttributeResponseDto();
-        dto.setId(attribute.getId());
-        dto.setName(attribute.getName());
-        dto.setValues(values);
-
-        return dto;
+                .map(attr -> getAttribute(attr.getId()))
+                .toList();
     }
 }

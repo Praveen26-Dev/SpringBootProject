@@ -39,8 +39,12 @@ public class ProductFeatureService {
 
     /* ================= GET FEATURES ================= */
 
-    public List<ProductFeature> getFeatures(Long productId) {
-
-        return repository.findByProductId(productId);
+    public List<String> getFeatures(Long productId){
+    	return repository.findByProductId(productId)
+                .stream()
+                .map(ProductFeature::getFeature)
+                .collect(java.util.stream.Collectors.toList());
+    
+    		
     }
 }

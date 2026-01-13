@@ -7,5 +7,5 @@ import lombok.Data;
 public class AttributeResponseDto {
     private Long id;
     private String name;
-    private List<String> values;
+    private List<AttributeValueResponseDto> values;
 }

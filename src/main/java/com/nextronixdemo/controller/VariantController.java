@@ -34,11 +34,11 @@ public class VariantController {
     /* ================= GET VARIANTS BY PRODUCT ================= */
 
     @GetMapping
-    public ResponseEntity<List<VariantResponseDto>> getVariantsByProduct(
+    public ResponseEntity<List<VariantResponseDto>> getVariants(
             @PathVariable Long productId) {
 
         List<VariantResponseDto> variants =
-                variantService.getVariantsByProduct(productId);
+                variantService.getVariants(productId);
 
         return ResponseEntity.ok(variants);
     }

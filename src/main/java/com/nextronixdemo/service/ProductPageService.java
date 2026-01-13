@@ -1,16 +1,17 @@
 package com.nextronixdemo.service;
 
-import java.util.*;
-import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-
-import com.nextronixdemo.dto.*;
-import com.nextronixdemo.model.ProductFeature;
-import com.nextronixdemo.model.ProductManufacturerInfo;
-import com.nextronixdemo.service.*;
+import com.nextronixdemo.dto.ProductImageResponseDto;
+import com.nextronixdemo.dto.ProductListItemDto;
+import com.nextronixdemo.dto.ProductPageResponseDto;
+import com.nextronixdemo.model.Product;
+import com.nextronixdemo.repository.BrandRepository;
+import com.nextronixdemo.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,179 +19,147 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductPageService {
 
-    private final ProductService productService;
+    private final ProductRepository productRepo;
+    private final BrandRepository brandRepo;
     private final CategoryService categoryService;
+    private final ProductImageService imageService;
     private final VariantService variantService;
-    private final AttributeService attributeService;
-    private final VariantPricingService variantPricingService;
-    private final ProductImageService productImageService;
-    private final ProductSpecificationService productSpecificationService;
-    private final ProductFeatureService productFeatureService;
-    private final ProductManufacturerInfoService manufacturerInfoService;
-    private final ModelMapper modelMapper;
+    private final ProductSpecificationService specificationService;
+    private final ProductFeatureService featureService;
+    private final ProductManufacturerInfoService manufacturerService;
+//    private final ProductQuestionService questionService;
+//    private final ProductReviewService reviewService;
+    private final ProductAttributeService productAttributeService;
+//    private final ProductAdditionalInfoService additionalInfoService;
+//    private final ProductVideoService productVideoService;
 
-    /* ===================== LISTING PAGE ===================== */
-    public List<ProductListingPageDto> getAllProductCards() {
+    public ProductPageResponseDto getProductPage(Long productId) {
 
-        List<ProductListingPageDto> cards = new ArrayList<>();
+        Product product = productRepo.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        // 1️⃣ Fetch all products
-        List<ProductResponseDto> products =
-                productService.getAllProducts(); // or getAllActiveProducts()
+        ProductPageResponseDto res = new ProductPageResponseDto();
 
-        for (ProductResponseDto product : products) {
+        // BASIC INFO
+        res.setProductId(product.getId());
+        res.setName(product.getName());
+        res.setDescription(product.getDescription());
 
-            Long productId = product.getId();
-
-            List<VariantResponseDto> variants =
-                    variantService.getVariantsByProduct(productId);
-
-            double minPrice = Double.MAX_VALUE;
-            double maxPrice = 0;
-            boolean inStock = false;
-            boolean hasPricedVariant = false;
-
-            for (VariantResponseDto v : variants) {
-
-                VariantPricingResponseDto pricing;
-
-                try {
-                    pricing = variantPricingService.getPricing(v.getId());
-                } catch (RuntimeException e) {
-                    // ❌ price not set for this variant → skip
-                    continue;
-                }
-
-                hasPricedVariant = true;
-
-                minPrice = Math.min(minPrice, pricing.getFinalPrice());
-                maxPrice = Math.max(maxPrice, pricing.getFinalPrice());
-
-                if (v.getStock() != null && v.getStock() > 0) {
-                    inStock = true;
-                }
-            }
-
-            // 🚫 No priced variants → skip product from listing
-            if (!hasPricedVariant) {
-                continue;
-            }
-
-            String thumbnail =
-                    productImageService.getImages(productId, null)
-                            .stream()
-                            .filter(img -> Boolean.TRUE.equals(img.getIsPrimary()))
-                            .map(ProductImageResponseDto::getImageUrl)
-                            .findFirst()
-                            .orElse(null);
-
-            cards.add(new ProductListingPageDto(
-                    productId,
-                    product.getName(),
-                    thumbnail,
-                    minPrice,
-                    maxPrice,
-                    inStock
-            ));
-        }
-
-        return cards;
-    }
-
-
-
-    /* ===================== DETAIL PAGE ===================== */
-
-    public ProductDetailsPageDto getProductPage(Long productId) {
-
-        ProductResponseDto product =
-                productService.getProductById(productId);
-
-        List<VariantResponseDto> variants =
-                variantService.getVariantsByProduct(productId);
-
-        Map<Long, VariantPricingResponseDto> pricingMap = new HashMap<>();
-        double minPrice = Double.MAX_VALUE;
-        double maxPrice = 0;
-        boolean inStock = false;
-
-        for (VariantResponseDto v : variants) {
-
-            VariantPricingResponseDto pricing =
-                    variantPricingService.getPricing(v.getId());
-
-            pricingMap.put(v.getId(), pricing);
-
-            minPrice = Math.min(minPrice, pricing.getFinalPrice());
-            maxPrice = Math.max(maxPrice, pricing.getFinalPrice());
-
-            if (v.getStock() != null && v.getStock() > 0) {
-                inStock = true;
-            }
-        }
-
-        if (minPrice == Double.MAX_VALUE) minPrice = 0;
-
-        Map<Long, AttributeResponseDto> attributes =
-                buildAttributeGroups(variants);
-
-        List<ProductFeatureResponseDto> features =
-                productFeatureService.getFeatures(productId)
-                        .stream()
-                        .map(f -> {
-                            ProductFeatureResponseDto dto =
-                                    new ProductFeatureResponseDto();
-                            dto.setProductId(f.getId());
-                            dto.setFeature(f.getFeature());
-                            return dto;
-                        })
-                        .collect(Collectors.toList());
-
-        ProductManufacturerInfo manufacturerEntity =
-                manufacturerInfoService.get(productId);
-
-        ProductManufacturerInfoResponseDto manufacturer =
-                manufacturerEntity == null
-                        ? null
-                        : modelMapper.map(
-                                manufacturerEntity,
-                                ProductManufacturerInfoResponseDto.class
-                        );
-
-        return new ProductDetailsPageDto(
-                product,
-                categoryService.getBreadCrumb(product.getCategoryId()),
-                productImageService.getImages(productId, null),
-                variants,
-                attributes,
-                pricingMap,
-                productSpecificationService.getSpecs(productId),
-                features,
-                manufacturer,
-                minPrice,
-                maxPrice,
-                inStock
+        // BRAND
+        res.setBrandName(
+                brandRepo.findById(product.getBrandId())
+                        .map(b -> b.getName())
+                        .orElse(null)
         );
+
+        // CATEGORY BREADCRUMB
+        res.setBreadcrumb(
+                categoryService.getBreadCrumb(product.getCategoryId())
+        );
+
+        // IMAGES
+        res.setImages(
+                imageService.getImages(productId, null)
+        );
+
+        // VARIANTS
+        res.setVariants(
+                variantService.getVariants(productId)
+        );
+
+        res.setAttributes(
+        	    variantService.buildVariantAttributes(productId)
+        	);
+
+        // SPECIFICATIONS
+        res.setSpecifications(
+        		 specificationService.getSpecs(productId)
+        		);
+
+        // FEATURES
+        res.setFeatures(
+                featureService.getFeatures(productId)
+        );
+         
+        //MANUFACTURER iNFO
+        res.setManufacturerInfo(
+        		manufacturerService.get(productId)
+        		);
+     
+        // PRICING 
+//        res.setVariantPricingResponse(
+//        		variantService.getPricing(productId)
+//        );
+//        // QUESTIONS
+//        res.setQuestions(
+//                questionService.getQnA(productId)
+//        );
+//
+//        // REVIEWS
+//        res.setReviews(
+//                reviewService.getReviews(productId)
+//        );
+//
+//        // RATING SUMMARY
+//        res.setRatingSummary(
+//                reviewService.getRatingSummary(productId)
+//        );
+//
+//        // ADDITIONAL INFO
+//        res.setAdditionalInfo(
+//                additionalInfoService.getByProduct(productId)
+//        );
+//
+//        // VIDEOS
+//        res.setVideos(
+//                productVideoService.getByProduct(productId)
+//        );
+
+        return res;
     }
 
-    /* ===================== ATTRIBUTE GROUPING ===================== */
+    public List<ProductListItemDto> getProductListing() {
 
-    private Map<Long, AttributeResponseDto> buildAttributeGroups(
-            List<VariantResponseDto> variants
-    ) {
+        List<Product> products = productRepo.findAll();
+        List<ProductListItemDto> list = new ArrayList<>();
 
-        Map<Long, AttributeResponseDto> map = new LinkedHashMap<>();
+        for (Product p : products) {
 
-        for (VariantResponseDto variant : variants) {
-            if (variant.getAttributes() == null) continue;
+            ProductListItemDto dto = new ProductListItemDto();
 
-            for (Long attributeId : variant.getAttributes().keySet()) {
-                map.computeIfAbsent(
-                        attributeId,
-                        attributeService::getAttributeById
-                );
-            }
+            dto.setProductId(p.getId());
+            dto.setName(p.getName());
+
+            /* -------- BRAND -------- */
+            dto.setBrand(
+                brandRepo.findById(p.getBrandId())
+                    .map(b -> b.getName())
+                    .orElse(null)
+            );
+
+            /* -------- PRICE (lowest variant price) -------- */
+            dto.setPrice(
+                variantService.getLowestPrice(p.getId())
+            );
+
+            /* -------- IMAGE (first product image) -------- */
+            dto.setImage(
+                imageService.getImages(p.getId(), null)
+                    .stream()
+                    .findFirst()
+                    .map(ProductImageResponseDto::getImageUrl)
+                    .orElse(null)
+            );
+
+            /* -------- RATING -------- */
+//            dto.setRating(
+//                reviewService.getAverageRating(p.getId())
+//            );
+
+            list.add(dto);
         }
-        return map;
+
+        return list;
     }
+
 }

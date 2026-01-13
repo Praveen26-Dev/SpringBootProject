@@ -4,10 +4,9 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.nextronixdemo.dto.ProductListingPageDto;
-import com.nextronixdemo.dto.ProductDetailsPageDto;
+import com.nextronixdemo.dto.ProductListItemDto;
+import com.nextronixdemo.dto.ProductPageResponseDto;
 import com.nextronixdemo.service.ProductPageService;
-
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -17,14 +16,14 @@ public class ProductPageController {
 
     private final ProductPageService service;
 
-    @GetMapping("/cards")
-    public List<ProductListingPageDto> getAllProductCards() {
-        return service.getAllProductCards();
+    @GetMapping("/list")
+    public List<ProductListItemDto> getAllProductCards() {
+        return service.getProductListing();
     }
 
 //     PRODUCT DETAIL PAGE
     @GetMapping("/{productId}")
-    public ProductDetailsPageDto getProductPage(
+    public ProductPageResponseDto getProductPage(
             @PathVariable Long productId
     ) {
         return service.getProductPage(productId);

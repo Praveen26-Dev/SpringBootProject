@@ -3,15 +3,23 @@ package com.nextronixdemo.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
+import com.nextronixdemo.dto.AttributeResponseDto;
+import com.nextronixdemo.dto.AttributeValueResponseDto;
 import com.nextronixdemo.dto.VariantRequestDto;
 import com.nextronixdemo.dto.VariantResponseDto;
+import com.nextronixdemo.model.Attribute;
+import com.nextronixdemo.model.AttributeValue;
 import com.nextronixdemo.model.Variant;
 import com.nextronixdemo.model.VariantAttributeValue;
+import com.nextronixdemo.repository.AttributeRepository;
+import com.nextronixdemo.repository.AttributeValueRepository;
 import com.nextronixdemo.repository.VariantAttributeValueRepository;
 import com.nextronixdemo.repository.VariantRepository;
 
@@ -22,6 +30,8 @@ import lombok.RequiredArgsConstructor;
 public class VariantService {
 	
 	private final VariantRepository variantRepository;
+	private final AttributeRepository attributeRepository;
+	private final AttributeValueRepository attributeValueRepository;
 	private final VariantAttributeValueRepository variantAttributeValueRepository;
     public VariantResponseDto createVariant(Long productId, VariantRequestDto dto) {
 
@@ -61,8 +71,7 @@ public class VariantService {
         return response;
     }
 	
-	
-	public List<VariantResponseDto> getVariantsByProduct(Long productId) {
+	public List<VariantResponseDto> getVariants(Long productId) {
 	
 
         List<Variant> variants = variantRepository.findByProductId(productId);
@@ -92,6 +101,61 @@ public class VariantService {
         return responseList; 
     }
 
+	
+	public Double getLowestPrice(Long productId) {
+		return variantRepository.findByProductId(productId)
+				.stream()
+				.map(Variant::getPrice)
+				.min(Double::compareTo)
+				.orElse(null);
+	}
+	
+
+public List<AttributeResponseDto> buildVariantAttributes(Long productId) {
+
+    List<VariantResponseDto> variants = getVariants(productId);
+
+    // attributeId → valueIds
+    Map<Long, Set<Long>> map = new HashMap<>();
+
+    for (VariantResponseDto v : variants) {
+        if (v.getAttributes() == null) continue;
+
+        for (Map.Entry<Long, Long> e : v.getAttributes().entrySet()) {
+            map.computeIfAbsent(e.getKey(), k -> new HashSet<>())
+               .add(e.getValue());
+        }
+    }
+
+    List<AttributeResponseDto> result = new ArrayList<>();
+
+    for (Long attrId : map.keySet()) {
+
+        Attribute attr = attributeRepository.findById(attrId)
+            .orElseThrow(() -> new RuntimeException("Attribute not found"));
+
+        AttributeResponseDto dto = new AttributeResponseDto();
+        dto.setId(attr.getId());
+        dto.setName(attr.getName());
+
+        List<AttributeValueResponseDto> values = new ArrayList<>();
+
+        for (Long valueId : map.get(attrId)) {
+            AttributeValue val = attributeValueRepository.findById(valueId)
+                .orElseThrow(() -> new RuntimeException("AttributeValue not found"));
+
+            values.add(new AttributeValueResponseDto(
+                val.getId(),
+                val.getValue()
+            ));
+        }
+
+        dto.setValues(values);
+        result.add(dto);
+    }
+
+    return result;
+}
 }
 
 

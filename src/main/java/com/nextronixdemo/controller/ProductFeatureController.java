@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.nextronixdemo.model.ProductFeature;
 import com.nextronixdemo.service.ProductFeatureService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/api/feature/{productId}")
@@ -28,13 +31,11 @@ public class ProductFeatureController {
         productFeatureService.saveFeatures(productId, features);
         return "Product features saved successfully";
     }
-
-    /* ================= GET FEATURES ================= */
-
+    
     @GetMapping
-    public List<ProductFeature> getFeatures(
-            @PathVariable Long productId
-    ) {
+    public List<String> getFeatures(@PathVariable Long productId) {
         return productFeatureService.getFeatures(productId);
     }
+    
+    
 }
