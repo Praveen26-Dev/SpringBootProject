@@ -40,7 +40,9 @@ public class SecurityConfig {
         				"/api/variants/**",
         				"/api/feature/**",
         				"api/manufacture/**",
-        				"/api/buyer/**"
+        				"/api/buyer/**",
+        				"/api/selection/**",
+        				"api/cart/**"
         				)
         		        .permitAll()
         		        .anyRequest()
