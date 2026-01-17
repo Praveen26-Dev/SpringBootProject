@@ -1,6 +1,7 @@
 package com.nextronixdemo.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,5 +12,7 @@ public interface ProductImageRepository  extends JpaRepository<ProductImage, Lon
 	List<ProductImage> findByProductIdAndVariantIdIsNull(Long productId);
 
 	List<ProductImage> findByProductIdAndVariantId(Long productId, Long variantId);
+    
 
+	Optional<ProductImage> findFirstByProductId(Long productId);
 }
